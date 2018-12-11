@@ -253,6 +253,9 @@ class thankslist
 								'U_VIEW_FORUM' => append_sid("{$this->phpbb_root_path}viewforum.$this->php_ext", 'f=' . $row['forum_id']),
 								'U_VIEW_POST' => (!empty($row['post_id'])) ? append_sid("{$this->phpbb_root_path}viewtopic.$this->php_ext", "t=" . $row['topic_id'] . '&amp;p=' . $row['post_id']) . '#p' . $row['post_id'] : '',
 							));
+                            // This is used to fix style error when going through thanks list and post contains locked content
+                            $this->path_prefix = ($this->manual_mode) ? './../' : './';
+                            $this->template->set_style(array($this->path_prefix . 'ext/gfksx/ThanksForPosts/styles', 'styles'));
 						}
 						while ($row = $this->db->sql_fetchrow($result));
 
