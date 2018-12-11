@@ -556,6 +556,26 @@ class helper
 
 			$reputation_pct = round($this->get_thanks_number($row['post_id']) / ($this->max_post_thanks / 100), $this->config['thanks_number_digits']);
 
+            // DOCMOD
+            // Create new event to set url's to false
+            // Other extension can modify u_receive_count_url and
+            // u_give_count_url to false to remove thanks links
+            // under user's avatar
+            $vars = array('u_receive_count_url', 'u_give_count_url', 'poster_id');
+            extract($this->phpbb_dispatcher->trigger_event('gfksx.thanksforposts.output_thanks_before', compact($vars)));
+
+
+            // If url is not false, set the url under avatar
+            if ($u_receive_count_url)
+            {
+                $postrow = array_merge($postrow, $thanks_text, array( 'POSTER_RECEIVE_COUNT_LINK' => $u_receive_count_url));
+            }
+            if ($u_give_count_url)
+            {
+                $postrow = array_merge($postrow, $thanks_text, array( 'POSTER_GIVE_COUNT_LINK' => $u_give_count_url,));
+            }
+            // END DOCMOD
+
 			$postrow = array_merge($postrow, $thanks_text, array(
 				'COND' => ($already_thanked) ? true : false,
 				'THANKS' => $this->get_thanks($row['post_id']),
@@ -566,8 +586,6 @@ class helper
 				'THANKS_FROM' => $this->user->lang('THANK_FROM'),
 				'POSTER_RECEIVE_COUNT' => $l_poster_receive_count,
 				'POSTER_GIVE_COUNT' => $l_poster_give_count,
-				'POSTER_RECEIVE_COUNT_LINK' => $u_receive_count_url,
-				'POSTER_GIVE_COUNT_LINK' => $u_give_count_url,
 				'S_IS_OWN_POST' => ($this->user->data['user_id'] == $poster_id) ? true : false,
 				'S_POST_ANONYMOUS' => ($poster_id == ANONYMOUS) ? true : false,
 				'THANK_IMG' => ($already_thanked) ? $this->user->img('removethanks', $this->user->lang('REMOVE_THANKS') . get_username_string('username', $poster_id, $row['username'], $row['user_colour'], $row['post_username'])) : $this->user->img('thankposts', $this->user->lang('THANK_POST') . get_username_string('username', $poster_id, $row['username'], $row['user_colour'], $row['post_username'])),
